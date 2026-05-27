@@ -34,6 +34,40 @@ app.get('/', (req, res) => {
   });
 });
 
+// Diagnostic route to test Gemini API connectivity and credentials
+app.get('/api/test-gemini', async (req, res) => {
+  const apiKey = config.geminiApiKey;
+  if (!apiKey) {
+    return res.json({ error: 'GEMINI_API_KEY is not set in environment variables.' });
+  }
+  
+  const modelName = 'gemini-2.5-flash';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+  
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: 'Say "API is working"' }] }]
+      })
+    });
+    
+    const text = await response.text();
+    res.json({
+      status: response.status,
+      statusText: response.statusText,
+      keyLength: apiKey.length,
+      keySnippet: apiKey.substring(0, 6) + '...' + apiKey.substring(apiKey.length - 4),
+      response: text.startsWith('{') ? JSON.parse(text) : text
+    });
+  } catch (err: any) {
+    res.json({ error: err.message });
+  }
+});
+
 // Global Error Handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Unhandled internal server error:', err);
