@@ -166,7 +166,7 @@ function renderPDFQuestionText(text: string) {
   return parts.map((part, index) => {
     if (part.startsWith('```')) {
       const lines = part.split('\n');
-      const code = lines.slice(1, -1).join('\n');
+      const code = lines.slice(1, -1).join('\n').replace(/ /g, '\u00A0');
       return (
         <Text key={index} style={{
           fontFamily: 'Courier',
@@ -180,9 +180,20 @@ function renderPDFQuestionText(text: string) {
         </Text>
       );
     }
+    
+    // Convert boundary spaces to non-breaking spaces to prevent trimming
+    let formattedPart = part;
+    if (formattedPart.startsWith(' ')) {
+      formattedPart = '\u00A0' + formattedPart.slice(1);
+    }
+    if (formattedPart.endsWith(' ')) {
+      formattedPart = formattedPart.slice(0, -1) + '\u00A0';
+    }
+    formattedPart = formattedPart.replace(/  /g, ' \u00A0');
+    
     return (
       <Text key={index} style={{ fontSize: 10 }}>
-        {part}
+        {formattedPart}
       </Text>
     );
   });
@@ -196,10 +207,10 @@ export function PaperPDF({ paper, meta, includeAnswers = false }: PaperPDFProps)
         <View style={styles.header}>
           <Text style={styles.title}>{meta.schoolName || 'ACADEMIC ASSESSMENT'}</Text>
           <Text style={styles.meta}>
-            Subject: {meta.subject}  |  Grade: {meta.grade}  |  Topic: {meta.topic || 'General'}
+            {`Subject: ${meta.subject}  |  Grade: ${meta.grade}  |  Topic: ${meta.topic || 'General'}`}
           </Text>
           <Text style={styles.meta}>
-            Maximum Marks: {meta.totalMarks}  |  Duration: 3 Hours
+            {`Maximum Marks: ${meta.totalMarks}  |  Duration: 3 Hours`}
           </Text>
         </View>
 
@@ -242,7 +253,7 @@ export function PaperPDF({ paper, meta, includeAnswers = false }: PaperPDFProps)
                   )}
                   
                   <Text style={styles.badge}>
-                    [{q.difficulty}] [{q.marks} mark{q.marks > 1 ? 's' : ''}]
+                    {`[${q.difficulty}]  |  [${q.marks} mark${q.marks > 1 ? 's' : ''}]`}
                   </Text>
                 </View>
               </View>
