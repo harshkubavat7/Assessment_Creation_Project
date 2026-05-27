@@ -36,7 +36,7 @@ export function authMiddleware(req: AuthenticatedRequest, res: Response, next: N
     res.clearCookie('token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     });
     return res.status(401).json({ error: 'Session expired. Please log in again.' });
   }
