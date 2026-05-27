@@ -160,6 +160,34 @@ interface PaperPDFProps {
   includeAnswers?: boolean;
 }
 
+function renderPDFQuestionText(text: string) {
+  if (!text) return null;
+  const parts = text.split(/(```[\s\S]*?```)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('```')) {
+      const lines = part.split('\n');
+      const code = lines.slice(1, -1).join('\n');
+      return (
+        <Text key={index} style={{
+          fontFamily: 'Courier',
+          fontSize: 8.5,
+          backgroundColor: '#f3f4f6',
+          padding: 6,
+          marginTop: 4,
+          marginBottom: 4
+        }}>
+          {code}
+        </Text>
+      );
+    }
+    return (
+      <Text key={index} style={{ fontSize: 10 }}>
+        {part}
+      </Text>
+    );
+  });
+}
+
 export function PaperPDF({ paper, meta, includeAnswers = false }: PaperPDFProps) {
   return (
     <Document>
@@ -200,7 +228,9 @@ export function PaperPDF({ paper, meta, includeAnswers = false }: PaperPDFProps)
               <View key={qi} style={styles.question}>
                 <Text style={styles.qNum}>Q{qi + 1}.</Text>
                 <View style={styles.qBody}>
-                  <Text style={styles.qText}>{q.text}</Text>
+                  <View style={{ marginBottom: 4 }}>
+                    {renderPDFQuestionText(q.text)}
+                  </View>
                   
                   {/* Options for MCQ */}
                   {q.options && q.options.length > 0 && (
@@ -230,9 +260,10 @@ export function PaperPDF({ paper, meta, includeAnswers = false }: PaperPDFProps)
                 {sec.questions.map((q, qi) => (
                   <View key={qi} style={styles.answerRow}>
                     <Text style={styles.answerNum}>{qi + 1}.</Text>
-                    <Text style={styles.answerText}>
-                      {q.answer || 'No answer solution key provided.'} ({q.difficulty})
-                    </Text>
+                    <View style={styles.answerText}>
+                      {renderPDFQuestionText(q.answer || 'No answer solution key provided.')}
+                      <Text style={{ fontSize: 8, color: '#6b7280', marginTop: 2 }}>({q.difficulty})</Text>
+                    </View>
                   </View>
                 ))}
               </View>

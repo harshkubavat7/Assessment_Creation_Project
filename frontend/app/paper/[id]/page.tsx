@@ -10,6 +10,28 @@ import DifficultyBadge from '../../../components/DifficultyBadge';
 import PaperHeader from '../../../components/PaperHeader';
 import StudentInfoBlock from '../../../components/StudentInfoBlock';
 
+function renderQuestionText(text: string) {
+  if (!text) return null;
+  const parts = text.split(/(```[\s\S]*?```)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('```')) {
+      const lines = part.split('\n');
+      const codeLines = lines.slice(1, -1);
+      const code = codeLines.join('\n');
+      return (
+        <pre key={index} className="bg-gray-50 border border-gray-200 rounded-xl p-3 my-2 text-[11px] font-mono text-gray-800 whitespace-pre overflow-x-auto leading-relaxed">
+          <code>{code}</code>
+        </pre>
+      );
+    }
+    return (
+      <span key={index} className="whitespace-pre-wrap font-bold text-gray-900 leading-relaxed text-xs">
+        {part}
+      </span>
+    );
+  });
+}
+
 export default function ExamPaperPage() {
   const params = useParams();
   const router = useRouter();
@@ -198,9 +220,9 @@ export default function ExamPaperPage() {
                         {qi + 1}.
                       </span>
                       <div className="flex-grow space-y-3">
-                        <p className="text-xs text-gray-900 leading-relaxed font-bold">
-                          {q.text}
-                        </p>
+                        <div className="space-y-1">
+                          {renderQuestionText(q.text)}
+                        </div>
 
                         {/* MCQ options */}
                         {q.options && q.options.length > 0 && (
@@ -250,10 +272,12 @@ export default function ExamPaperPage() {
                   </div>
                   <div className="space-y-2 pl-2">
                     {sec.questions.map((q, qi) => (
-                      <div key={qi} className="text-xs text-gray-700 leading-relaxed font-semibold">
-                        <span className="font-bold text-gray-900 mr-2">{qi + 1}.</span>
-                        {q.answer || 'No answer key provided for this question.'}
-                        <span className="text-[10px] text-[#8E8E93] ml-2 font-normal">({q.difficulty})</span>
+                      <div key={qi} className="text-xs text-gray-700 leading-relaxed font-semibold flex items-start gap-1">
+                        <span className="font-bold text-gray-900 min-w-[20px]">{qi + 1}.</span>
+                        <div className="flex-grow space-y-1">
+                          {renderQuestionText(q.answer || 'No answer key provided for this question.')}
+                          <span className="text-[10px] text-[#8E8E93] font-normal block mt-1">({q.difficulty})</span>
+                        </div>
                       </div>
                     ))}
                   </div>
