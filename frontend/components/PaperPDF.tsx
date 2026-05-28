@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
   },
   question: { 
     flexDirection: 'row', 
-    marginBottom: 10,
+    marginBottom: 18,
     paddingLeft: 6
   },
   qNum: { 
@@ -100,7 +100,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginLeft: 8,
-    marginBottom: 4
+    marginTop: 4,
+    marginBottom: 6
   },
   optionText: { 
     width: '50%',
@@ -110,8 +111,8 @@ const styles = StyleSheet.create({
   badge: { 
     fontSize: 8, 
     color: '#4b5563', 
-    marginTop: 2,
-    fontWeight: 'medium'
+    marginTop: 4,
+    fontWeight: 'normal'
   },
   footer: {
     position: 'absolute',
