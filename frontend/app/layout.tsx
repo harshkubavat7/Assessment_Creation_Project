@@ -141,7 +141,7 @@ export default function RootLayout({
   if (authStatus === 'checking') {
     return (
       <html lang="en">
-        <body className="flex h-screen w-screen items-center justify-center bg-[#F4F4F6]">
+        <body className="flex h-dvh w-screen items-center justify-center bg-[#F4F4F6]">
           <div className="flex flex-col items-center">
             <span className="w-10 h-10 border-4 border-[#FF5A36] border-t-transparent rounded-full animate-spin mb-4" />
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Checking session...</p>
@@ -154,7 +154,7 @@ export default function RootLayout({
   // Render standard Authenticated Layout wrapping
   return (
     <html lang="en">
-      <body className="flex h-screen bg-[#F4F4F6] text-[#2C2C2C] font-sans overflow-hidden antialiased">
+      <body className="flex h-dvh bg-[#F4F4F6] text-[#2C2C2C] font-sans overflow-hidden antialiased">
         
         {/* Desktop Left Sidebar (Hidden on mobile) */}
         <aside className="hidden md:flex w-64 bg-white border-r border-[#E5E5EA] flex-col justify-between p-6 flex-shrink-0 z-20">
