@@ -175,7 +175,7 @@ interface PaperPDFProps {
   includeAnswers?: boolean;
 }
 
-function renderPDFQuestionText(text: string) {
+function renderPDFText(text: string, fontSize: number = 10, color: string = '#1a1a1a') {
   if (!text) return null;
   const parts = text.split(/(```[\s\S]*?```)/g);
   return parts.map((part, index) => {
@@ -185,11 +185,11 @@ function renderPDFQuestionText(text: string) {
       return (
         <Text key={index} style={{
           fontFamily: 'Roboto Mono',
-          fontSize: 8.5,
+          fontSize: fontSize - 1.5,
           backgroundColor: '#f3f4f6',
-          padding: 6,
-          marginTop: 4,
-          marginBottom: 4
+          padding: 4,
+          marginTop: 2,
+          marginBottom: 2
         }}>
           {code}
         </Text>
@@ -207,7 +207,7 @@ function renderPDFQuestionText(text: string) {
     formattedPart = formattedPart.replace(/  /g, ' \u00A0');
     
     return (
-      <Text key={index} style={{ fontSize: 10 }}>
+      <Text key={index} style={{ fontSize, color }}>
         {formattedPart}
       </Text>
     );
@@ -255,14 +255,16 @@ export function PaperPDF({ paper, meta, includeAnswers = false }: PaperPDFProps)
                 <Text style={styles.qNum}>Q{qi + 1}.</Text>
                 <View style={styles.qBody}>
                   <View style={{ marginBottom: 4 }}>
-                    {renderPDFQuestionText(q.text)}
+                    {renderPDFText(q.text, 10, '#1a1a1a')}
                   </View>
                   
                   {/* Options for MCQ */}
                   {q.options && q.options.length > 0 && (
                     <View style={styles.optionRow}>
                       {q.options.map((o, oi) => (
-                        <Text key={oi} style={styles.optionText}>{o}</Text>
+                        <View key={oi} style={styles.optionText}>
+                          {renderPDFText(o, 9, '#374151')}
+                        </View>
                       ))}
                     </View>
                   )}
@@ -287,7 +289,7 @@ export function PaperPDF({ paper, meta, includeAnswers = false }: PaperPDFProps)
                   <View key={qi} style={styles.answerRow}>
                     <Text style={styles.answerNum}>{qi + 1}.</Text>
                     <View style={styles.answerText}>
-                      {renderPDFQuestionText(q.answer || 'No answer solution key provided.')}
+                      {renderPDFText(q.answer || 'No answer solution key provided.', 9, '#374151')}
                       <Text style={{ fontSize: 8, color: '#6b7280', marginTop: 2 }}>({q.difficulty})</Text>
                     </View>
                   </View>

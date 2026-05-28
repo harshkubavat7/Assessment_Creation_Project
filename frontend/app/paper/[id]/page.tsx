@@ -115,8 +115,8 @@ export default function ExamPaperPage() {
       
       {/* Action Bar (Hidden on print) */}
       <div className="bg-white border-b border-[#E5E5EA] shadow-sm sticky top-0 z-50 no-print print:hidden">
-        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
-          <div className="flex items-center space-x-3">
+        <div className="max-w-5xl mx-auto px-4 py-3 md:py-0 md:h-16 flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="flex items-center space-x-3 w-full md:w-auto justify-between md:justify-start">
             <button
               onClick={handleNew}
               className="flex items-center space-x-1.5 px-3.5 py-2 border border-[#E5E5EA] rounded-xl text-xs font-bold text-gray-700 hover:bg-gray-50 transition"
@@ -136,25 +136,25 @@ export default function ExamPaperPage() {
           </div>
 
           {/* Interactive controls */}
-          <div className="flex items-center space-x-3 flex-1 justify-end max-w-2xl">
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-between md:justify-end">
             {/* School Name editor */}
             <input
               type="text"
-              className="px-3.5 py-2 border border-[#E5E5EA] rounded-xl text-xs text-gray-800 focus:outline-none focus:border-[#FF5A36] w-48 font-bold bg-[#F4F4F6] focus:bg-white transition"
+              className="px-3.5 py-2 border border-[#E5E5EA] rounded-xl text-xs text-gray-800 focus:outline-none focus:border-[#FF5A36] w-full sm:w-48 font-bold bg-[#F4F4F6] focus:bg-white transition flex-grow sm:flex-grow-0"
               placeholder="Edit School Name"
               value={schoolName}
               onChange={(e) => setSchoolName(e.target.value)}
             />
 
             {/* Answer key checkbox print toggle */}
-            <label className="flex items-center space-x-2 text-xs font-bold text-gray-700 cursor-pointer">
+            <label className="flex items-center space-x-2 text-xs font-bold text-gray-700 cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={includeAnswersInPrint}
                 onChange={(e) => setIncludeAnswersInPrint(e.target.checked)}
                 className="w-4 h-4 accent-[#FF5A36] rounded border-[#E5E5EA] cursor-pointer"
               />
-              <span>Print with Answers</span>
+              <span className="whitespace-nowrap">Print with Answers</span>
             </label>
 
             {/* Dynamic PDF Download Link */}
@@ -162,12 +162,12 @@ export default function ExamPaperPage() {
               <PDFDownloadLink
                 document={<PaperPDF paper={paper} meta={{ ...assignment, schoolName }} includeAnswers={includeAnswersInPrint} />}
                 fileName={`${assignment.subject.replace(/\s+/g, '_')}_Exam_Paper.pdf`}
-                className="px-5 py-2 bg-[#1C1C1E] hover:bg-black text-white rounded-full text-xs font-bold shadow-sm transition border border-[#FF5A36]"
+                className="px-5 py-2 bg-[#1C1C1E] hover:bg-black text-white rounded-full text-xs font-bold shadow-sm transition border border-[#FF5A36] whitespace-nowrap text-center flex-grow sm:flex-grow-0"
               >
                 {({ loading }) => (loading ? 'Preparing PDF...' : 'Download PDF')}
               </PDFDownloadLink>
             ) : (
-              <button className="px-5 py-2 bg-gray-200 text-gray-400 rounded-full text-xs font-bold cursor-not-allowed">
+              <button className="px-5 py-2 bg-gray-200 text-gray-400 rounded-full text-xs font-bold cursor-not-allowed flex-grow sm:flex-grow-0">
                 Loading PDF...
               </button>
             )}
