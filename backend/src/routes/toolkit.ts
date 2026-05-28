@@ -193,41 +193,71 @@ router.post('/toolkit/generate', async (req: AuthenticatedRequest, res: Response
     const apiKey = config.geminiApiKey;
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
+    const maxRetries = 3;
+    let delay = 1500;
+    let lastError: any = null;
+    let parsed: any = null;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contents: [
               {
-                text: prompt
+                parts: [
+                  {
+                    text: prompt
+                  }
+                ]
               }
-            ]
-          }
-        ],
-        generationConfig: {
-          responseMimeType: 'application/json'
+            ],
+            generationConfig: {
+              responseMimeType: 'application/json'
+            }
+          })
+        });
+
+        // Handle transient errors with retry
+        if (response.status === 503 || response.status === 429) {
+          console.warn(`Gemini API toolkit returned status ${response.status} (attempt ${attempt}/${maxRetries}) due to high demand. Retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          delay *= 2;
+          continue;
         }
-      })
-    });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error(`Gemini API error (status ${response.status}):`, errText);
-      throw new Error(`Gemini API returned status ${response.status}`);
+        if (!response.ok) {
+          const errText = await response.text();
+          console.error(`Gemini API error (status ${response.status}):`, errText);
+          throw new Error(`Gemini API returned status ${response.status}`);
+        }
+
+        const result = await response.json() as any;
+        const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!text) {
+          throw new Error('Gemini API response structure invalid or empty candidates');
+        }
+
+        const cleaned = text.replace(/```json|```/g, '').trim();
+        parsed = JSON.parse(cleaned);
+        break; // Break the loop if we succeed
+      } catch (error: any) {
+        lastError = error;
+        console.warn(`Gemini API toolkit call attempt ${attempt} failed: ${error.message || error}`);
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, delay));
+          delay *= 2;
+        }
+      }
     }
 
-    const result = await response.json() as any;
-    const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) {
-      throw new Error('Gemini API response structure invalid or empty candidates');
+    if (!parsed) {
+      console.error('All Gemini API retries exhausted for toolkit generator:', lastError);
+      throw new Error(`AI generation failed: ${lastError.message || lastError}`);
     }
-
-    const cleaned = text.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(cleaned);
 
     res.json({
       success: true,
