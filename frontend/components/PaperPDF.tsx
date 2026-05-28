@@ -1,11 +1,26 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
 import { QuestionPaper } from '../types';
+
+// Register standard fonts from stable CDN to ensure identical character widths and line wraps across desktop and mobile devices
+Font.register({
+  family: 'Roboto',
+  fonts: [
+    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-400-normal.woff', fontWeight: 400, fontStyle: 'normal' },
+    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-700-normal.woff', fontWeight: 700, fontStyle: 'normal' },
+    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-400-italic.woff', fontWeight: 400, fontStyle: 'italic' }
+  ]
+});
+
+Font.register({
+  family: 'Roboto Mono',
+  src: 'https://cdn.jsdelivr.net/fontsource/fonts/roboto-mono@latest/latin-400-normal.woff'
+});
 
 const styles = StyleSheet.create({
   page: { 
     padding: 40, 
-    fontFamily: 'Helvetica', 
+    fontFamily: 'Roboto', 
     fontSize: 10, 
     lineHeight: 1.6,
     color: '#1a1a1a'
@@ -169,7 +184,7 @@ function renderPDFQuestionText(text: string) {
       const code = lines.slice(1, -1).join('\n').replace(/ /g, '\u00A0');
       return (
         <Text key={index} style={{
-          fontFamily: 'Courier',
+          fontFamily: 'Roboto Mono',
           fontSize: 8.5,
           backgroundColor: '#f3f4f6',
           padding: 6,
